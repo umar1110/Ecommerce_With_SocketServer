@@ -1,0 +1,28 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "client",
+      "use": "@vercel/static-build"
+    },
+    {
+      "src": "server/server.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/.*",
+      "dest": "server/server.js"
+    }
+  ],
+  "env": {
+    "FRONTEND_URL": "localhost",
+    "PORT": "4000",
+    "DB_URI": "mongodb+srv://loomUmar1110:umar1110@cellcave.txijojc.mongodb.net/loomecom",
+    "NODE_ENV": "DEVELOPMENT",
+    "JWT_SECRET": "sakdjaksjdhkasjnoasdoasdjoas",
+    "JWT_EXPIRE": "10d",
+    "COOKIE_EXPIRE": "10"
+  }
+}
