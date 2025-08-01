@@ -1,12 +1,15 @@
 const asyncHandler = require("../utils/asyncHandler");
 const Product = require("../models/productModel");
 const ApiError = require("../utils/ApiError");
-const { unlinkProductImage } = require("../utils/unlinkFile");
 const { ApiResponse } = require("../utils/ApiResponse");
 const MainCategory = require("../models/mainCategoryModel");
 const SubCategory = require("../models/subCategoryModel");
 const Category = require("../models/categoryModel");
 const Review = require("../models/reviewModel");
+const {
+  uploadFilesToCloudinary,
+  deletFilesFromCloudinary,
+} = require("../helpers/cloudinaryUpload");
 // Create a new product
 exports.createProduct = asyncHandler(async (req, res) => {
   const productImages = req.files?.productImages ? req.files.productImages : [];
@@ -15,14 +18,12 @@ exports.createProduct = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Product Images are required");
   }
 
-  const images = productImages.map((image) => {
-  
-
+  const uploadResponse = await uploadFilesToCloudinary(productImages);
+  console.log("Upload Response:", uploadResponse);
+  const images = uploadResponse.map((image) => {
     return {
-      public_id: image.filename,
-      url: `${req.protocol}://${req.get("host")}/uploads\\images\\products\\${
-        image.filename
-      }`,
+      public_id: image.public_id,
+      url: image.url,
     };
   });
 
@@ -62,11 +63,17 @@ exports.createProduct = asyncHandler(async (req, res) => {
     });
   } catch (error) {
     // Delete images if product creation failed
-
+    if (uploadResponse.length > 0) {
+      uploadResponse.forEach(async (image) => {
+        try {
+          await deletFilesFromCloudinary(image.public_id);
+        } catch (error) {
+          console.error("Failed to delete image:", error.message);
+        }
+      });
+    }
     console.log(error.message);
-    images.forEach(async (image) => {
-      await unlinkProductImage(image.public_id);
-    });
+
     throw error;
   }
 
@@ -86,14 +93,11 @@ exports.updateProduct = asyncHandler(async (req, res) => {
   //  new Images to be uploaded
   const productImages = req.files?.productImages ? req.files.productImages : [];
 
-  const images = productImages.map((image) => {
- 
-
+  const uploadResponse = await uploadFilesToCloudinary(productImages);
+  const images = uploadResponse.map((image) => {
     return {
-      public_id: image.filename,
-      url: `${req.protocol}://${req.get("host")}/uploads\\images\\products\\${
-        image.filename
-      }`,
+      public_id: image.public_id,
+      url: image.url,
     };
   });
 
@@ -133,7 +137,7 @@ exports.updateProduct = asyncHandler(async (req, res) => {
   if (parsedDeletedOldImages.length > 0) {
     parsedDeletedOldImages.forEach(async (image) => {
       try {
-        await unlinkProductImage(image.public_id);
+        await deletFilesFromCloudinary(image.public_id);
       } catch (error) {
         console.error("Failed to delete image:", error.message);
       }
@@ -162,7 +166,7 @@ exports.deleteProduct = asyncHandler(async (req, res) => {
   const images = product.images.map((image) => image.public_id);
   images.forEach(async (image) => {
     try {
-      await unlinkProductImage(image);
+      await deletFilesFromCloudinary(image.public_id);
     } catch (error) {
       console.error("Failed to delete image:", error.message);
     }

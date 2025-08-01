@@ -9,6 +9,14 @@ const http = require("http");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
 const { server } = require("./Config/socket");
+const cloudinary = require("cloudinary").v2;
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
 process.on("uncaughtException", (err) => {
   console.log(`Error: ${err.message}`);
   console.log("Shutting down the server due to Uncaught Exception");

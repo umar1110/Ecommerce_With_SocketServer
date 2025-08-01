@@ -211,9 +211,17 @@ function AddProduct() {
       !costPrice ||
       !salePrice ||
       !stock ||
-      !description ||
-      !smallDescription
+      !smallDescription ||
+      !description
     ) {
+      console.log(
+        title,
+        costPrice,
+        salePrice,
+        stock,
+        description,
+        smallDescription
+      );
       return toast.error("Please fill all required fields");
     }
 
@@ -497,8 +505,8 @@ function AddProduct() {
           tabIndex={1}
           className="text-black"
           toolbarAdaptive={false}
-          // onChange={(newContent) => setdescription(newContent)}
-          onBlur={(newContent, editor) => setdescription(editor.getContent())}
+          onChange={(newContent) => setdescription(newContent)}
+          // onBlur={(newContent, editor) => setdescription(editor.getContent())}
         />
       </div>
 

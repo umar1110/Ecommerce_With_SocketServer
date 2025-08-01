@@ -16,6 +16,7 @@ const errorHandler = (err, req, res, next) => {
     let message;
     // Add product without data
     if (err.name === "ValidationError") {
+      console.error("Validation Error:", err);
       message = "Validation Error , Enter valid and complete data";
     } else if (err.code === 11000) {
       message = `Duplicate ${Object.keys(err.keyValue)} Entered`;
