@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosBackend = axios.create({
-  baseURL: "http://localhost:5000",
+  baseURL: "",
   // baseURL: "https://luxuryloomshop.com/server",
 });
 
